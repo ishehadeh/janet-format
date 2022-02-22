@@ -7,11 +7,12 @@ static Janet cfun_to_decimal(int32_t argc, Janet* argv) {
     double number = janet_getnumber(argv, 0);
 
     using namespace jkj::dragonbox::policy;
-    auto parts = jkj::dragonbox::to_decimal(number, sign::ignore, trailing_zero::remove, decimal_to_binary_rounding::nearest_to_even, binary_to_decimal_rounding::to_even, cache::full);
+    auto parts = jkj::dragonbox::to_decimal(number, sign::return_sign, trailing_zero::remove, decimal_to_binary_rounding::nearest_to_even, binary_to_decimal_rounding::to_even, cache::full);
 
-    Janet* tuple = janet_tuple_begin(2);
-    tuple[0] = janet_wrap_u64(parts.significand);
-    tuple[1] = janet_wrap_integer(parts.exponent);
+    Janet* tuple = janet_tuple_begin(3);
+    tuple[0] = janet_wrap_boolean(!parts.is_negative);
+    tuple[1] = janet_wrap_u64(parts.significand);
+    tuple[2] = janet_wrap_integer(parts.exponent);
     return janet_wrap_tuple(janet_tuple_end(tuple));
 }
 

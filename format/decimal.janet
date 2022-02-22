@@ -60,7 +60,7 @@
 
   (- result (% x last-digit-magnitude)))
 
-(defn format-decimal-fixed-reversed [[significand exponent] {:precision precision :alternate keep-decimal}]
+(defn format-decimal-fixed-reversed [[sign significand exponent] {:precision precision :alternate keep-decimal}]
   (default keep-decimal false)
 
   (assert (u64? significand))
@@ -117,7 +117,7 @@
   (loop [i :down-to [(dec (length reversed)) 0]]
     (yield (reversed i))))
 
-(defn format-decimal-scientific [[significand exponent] {:alternate keep-decimal :precision precision :number num-spec}]
+(defn format-decimal-scientific [[sign significand exponent] {:alternate keep-decimal :precision precision :number num-spec}]
   (assert (u64? significand))
   (assert (int? exponent))
 
@@ -127,7 +127,7 @@
 
   # buffer used for holding the numbers it will be reversed before being emitted
   (def scratch-buffer (buffer/new 20))
-  (loop [c :in (coro (format-decimal-fixed-reversed [significand fixed-part-exponent] {:alternate keep-decimal :precision precision}))]
+  (loop [c :in (coro (format-decimal-fixed-reversed [sign significand fixed-part-exponent] {:alternate keep-decimal :precision precision}))]
     (buffer/push scratch-buffer c))
 
   (loop [i :down-to [(dec (length scratch-buffer)) 0]]
@@ -151,7 +151,7 @@
   (loop [i :down-to [(dec (length scratch-buffer)) 0]]
     (yield (scratch-buffer i))))
 
-(defn format-decimal-general [[significand exponent] spec]
+(defn format-decimal-general [[sign significand exponent] spec]
   (def rounded-significand
     (if-let [precision (spec :precision)]
       (u64-round-significant-digits significand precision)
@@ -159,5 +159,5 @@
 
   (def exponent-needed (math/abs (+ exponent (u64-count-significant-digits rounded-significand))))
   (if (> exponent-needed 4)
-    (format-decimal-scientific [significand exponent] spec)
-    (format-decimal-fixed [significand exponent] spec)))
+    (format-decimal-scientific [sign significand exponent] spec)
+    (format-decimal-fixed [sign significand exponent] spec)))
