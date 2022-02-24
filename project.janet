@@ -4,12 +4,12 @@
 
 (declare-native
   :name "int-ext"
-  :source [ "int-ext/int-ext.c" ])
+  :source ["int-ext/int-ext.c"])
 
 (declare-native
   :name "dragonbox"
-  :cppflags [ "-std=c++17" ]
-  :source [ "dragonbox/dragonbox-janet.cpp" ])
+  :cppflags ["-std=c++17"]
+  :source ["dragonbox/dragonbox-janet.cpp"])
 
 (declare-source :source "format")
 

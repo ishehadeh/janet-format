@@ -8,4 +8,4 @@
 (assert= (format "{:b}" 15) "1111")
 
 (assert= (format "{:^20}" 15) "         15         ")
-(assert= (format "{:5}{:5}" 1 2) "    1    2" )
+(assert= (format "{:5}{:5}" 1 2) "    1    2")

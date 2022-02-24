@@ -31,8 +31,8 @@
 (fprint "{}{3}{}{3}{}" "foo" "bar" "baz" ".") # => foo.bar.baz
 
 # Identifiers can be used to format local values
-(let [ x 5
-       y 6 ]
+(let [x 5
+      y 6]
   (fprint "({x}, {y})")) # => (5, 6)
 
 # Format specifiers are seperated from the paramater with a ":"
@@ -104,7 +104,7 @@
 (fprint "abs({:+}) = {:+}" -5 5) # => abs(-5) = +5
 
 # The " " (space) flag can be used to replace "+" with " " when printing sign
-(fprint "| {: }  |\n| {: }  |\n| {: }  |" 1 -2 3) 
+(fprint "| {: }  |\n| {: }  |\n| {: }  |" 1 -2 3)
 # => |  1  |
 # => | -2  |
 # => |  3  |
@@ -134,13 +134,13 @@
 
 
 # Container types will print each value on a newline, and indent.
-(fprint "{:#}" @[ :a :b :c ])
+(fprint "{:#}" @[:a :b :c])
 # => @[
 # =>   :a
 # =>   :b
 # =>   :c
 # => ]
-(fprint "{:#}" { :a 1 :b 2 :c 3 })
+(fprint "{:#}" {:a 1 :b 2 :c 3})
 # => {
 # =>   :c 1
 # =>   :a 2
@@ -148,7 +148,7 @@
 # => }
 
 # They also forward the alternate form to their children
-(fprint "{:#}" { :a 1 :b [ "hello\0world" ] :c 3 })
+(fprint "{:#}" {:a 1 :b ["hello\0world"] :c 3})
 # => {
 # =>   :c 1
 # =>   :a 2
@@ -170,3 +170,4 @@
 
 # For floats, the precision is the number of characters after the decimal point
 (fprint "{0:.1f} {0:.5f} {1:.5f}" math/pi 1) # => 3.1 3.14159 1.00000
+

@@ -1,8 +1,8 @@
 (use /format/decimal /format/util)
 (use /test-util)
 
-(defmacro num-round-significant-digits [ s f ] ~(,u64-round-significant-digits (int/u64 ,s) ,f))
-(defmacro num-count-significant-digits [ s ] ~(,u64-count-significant-digits ,(int/u64 s)))
+(defmacro num-round-significant-digits [s f] ~(,u64-round-significant-digits (int/u64 ,s) ,f))
+(defmacro num-count-significant-digits [s] ~(,u64-count-significant-digits ,(int/u64 s)))
 
 (assert= (u64-count-digits (u64 1000)) 4)
 (assert= (u64-count-digits (u64 1)) 1)

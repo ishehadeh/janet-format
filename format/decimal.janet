@@ -6,7 +6,7 @@
 (def- u64-max (u64 "18446744073709551615"))
 (defmacro- gen-u64-count-digits
   "Count the number digits in a u64, `val`, by generating a cond-table inline."
-  [ val &keys { :magnitude return-magnitude } ]
+  [val &keys {:magnitude return-magnitude}]
 
   (def conditions @[])
   (var magnitude (u64 10))
@@ -18,13 +18,13 @@
     (*= magnitude (u64 10))
     (+= digits 1))
 
-    (array/push conditions digits ~(>= ,val ,magnitude))
+  (array/push conditions digits ~(>= ,val ,magnitude))
 
   ~(cond ,;(reverse conditions) 1))
 
 (defmacro- gen-u64-pow10-table
   "generate an tuple with the integer powers of 10, [1 10 100 (...) ] up to u64-max"
-  [ ]
+  []
 
   (def powers @[])
   (var pow (u64 1))
@@ -36,19 +36,19 @@
 
 (defn u64-count-digits
   "returns the number of decimal digits in an int/u64"
-  [ x ]
+  [x]
   (gen-u64-count-digits x))
 
 (defn u64-count-significant-digits
   "returns the number of significant digits (i.e. digits excluding trailing zeroes) in an int/u64"
-  [ x ]
+  [x]
   (if (= (% x (u64 10)) (u64 0))
     (u64-count-significant-digits (/ x (u64 10)))
     (u64-count-digits x)))
 
 (defn u64-round-significant-digits
   "round an int/u64 to the given number of signficant digits"
-  [ x digits ]
+  [x digits]
   (def pow10-table (gen-u64-pow10-table))
   (def total-digits (u64-count-digits x))
   (def roundoff-magnitude (pow10-table (- total-digits digits 1)))
@@ -60,7 +60,7 @@
 
   (- result (% x last-digit-magnitude)))
 
-(defn format-decimal-fixed-reversed [ [significand exponent] { :precision precision :alternate keep-decimal }]
+(defn format-decimal-fixed-reversed [[significand exponent] {:precision precision :alternate keep-decimal}]
   (default keep-decimal false)
 
   (assert (u64? significand))
@@ -87,11 +87,11 @@
     (set need-decimal true))
 
   (def num-digits (u64-count-digits significand))
-  
+
   (forever
     (when (and need-decimal (= current-exponent 0))
       (yield (chr ".")))
-    
+
     # print the current digit only if
     #  1. current place is before the decimal (current exponent > 0)
     #  2. current place is after the decimal and greater than the given precision
@@ -101,33 +101,33 @@
 
     (++ current-exponent)
     (/= remaining-digits (u64 10))
-    
+
     (when (and (> current-exponent 0) (= remaining-digits (u64 0)))
       (break))))
 
-(defn format-decimal-fixed [ parts spec]
+(defn format-decimal-fixed [parts spec]
   (def reversed (buffer/new 20))
   (def reversed-generator
     (coro
       (format-decimal-fixed-reversed parts spec)))
 
-  (loop [ c :in reversed-generator]
+  (loop [c :in reversed-generator]
     (buffer/push reversed c))
-  
+
   (loop [i :down-to [(dec (length reversed)) 0]]
     (yield (reversed i))))
 
-(defn format-decimal-scientific [ [significand exponent] { :alternate keep-decimal :precision precision :number num-spec }]
+(defn format-decimal-scientific [[significand exponent] {:alternate keep-decimal :precision precision :number num-spec}]
   (assert (u64? significand))
   (assert (int? exponent))
 
   (def digits (u64-count-digits significand))
   (def fixed-part-exponent (- 1 digits))
   (def real-exponent (- exponent fixed-part-exponent))
-  
+
   # buffer used for holding the numbers it will be reversed before being emitted
   (def scratch-buffer (buffer/new 20))
-  (loop [ c :in (coro (format-decimal-fixed-reversed [ significand fixed-part-exponent ] { :alternate keep-decimal :precision precision }))]
+  (loop [c :in (coro (format-decimal-fixed-reversed [significand fixed-part-exponent] {:alternate keep-decimal :precision precision}))]
     (buffer/push scratch-buffer c))
 
   (loop [i :down-to [(dec (length scratch-buffer)) 0]]
@@ -135,7 +135,7 @@
 
   (yield (if (and num-spec (num-spec :uppercase)) "E" "e"))
   (yield (if (neg? real-exponent) "-" "+"))
-  
+
   (buffer/clear scratch-buffer)
   (var remaining-exp-digits (math/abs real-exponent))
 
@@ -151,12 +151,12 @@
   (loop [i :down-to [(dec (length scratch-buffer)) 0]]
     (yield (scratch-buffer i))))
 
-(defn format-decimal-general [ [significand exponent] spec ]
+(defn format-decimal-general [[significand exponent] spec]
   (def rounded-significand
-    (if-let [ precision (spec :precision) ]
+    (if-let [precision (spec :precision)]
       (u64-round-significant-digits significand precision)
       significand))
-  
+
   (def exponent-needed (math/abs (+ exponent (u64-count-significant-digits rounded-significand))))
   (if (> exponent-needed 4)
     (format-decimal-scientific [significand exponent] spec)

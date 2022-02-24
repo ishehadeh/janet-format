@@ -1,10 +1,10 @@
 (use ./integer ./util)
 
-(defn escaped-length [ str ]
+(defn escaped-length [str]
   "Get the lenght of str if were escaped"
   (reduce |(+ $0 (char-escaped-length $1)) 0 str))
 
-(defn format-string [ value { :alternate alternate :precision precision :pad pad }]
+(defn format-string [value {:alternate alternate :precision precision :pad pad}]
   (assert (string? value))
 
   (def value-length
@@ -13,10 +13,10 @@
         (+ (escaped-length value) 2) # value will be surrounded in quotes and will be escaped in debug mode
         (length value))
       precision))
-  
+
   (def [pad-l pad-r pad-char]
-    (if-let [ { :width width :align align :fill fill } pad
-              padding-needed (- width value-length) ]
+    (if-let [{:width width :align align :fill fill} pad
+             padding-needed (- width value-length)]
       (do
         (default align :right)
         (default fill (chr " "))
@@ -36,7 +36,7 @@
       (var written 2) # the two quotes will always be written
       (yield (chr "\""))
 
-      (loop [ data :in (coro (generate-escaped value))]
+      (loop [data :in (coro (generate-escaped value))]
         (def len
           (case (type data)
             :string (length data)
@@ -49,4 +49,4 @@
 
       (yield (chr "\""))))
 
-    (repeat pad-r (yield pad-char)))
+  (repeat pad-r (yield pad-char)))
