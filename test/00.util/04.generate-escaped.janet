@@ -9,4 +9,3 @@
 (assert= (esc (chr "a")) "a")
 (assert= (esc (chr "\n")) "\\n")
 (assert= (esc 255) "\\xff")
-(assert= (esc "\n\rab\xdd") "\\n\\rab\\xdd")

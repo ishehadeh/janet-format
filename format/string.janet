@@ -36,16 +36,10 @@
       (var written 2) # the two quotes will always be written
       (yield (chr "\""))
 
-      (loop [data :in (coro (generate-escaped value))]
-        (def len
-          (case (type data)
-            :string (length data)
-            :number 1
-            (errorf "expected character-code or string, got %q (%q)" data (type data))))
-        (when (> (+ written len) value-length)
-          (break))
-        (yield data)
-        (+= written len))
+      (loop [c :in value
+             :before (+= written (char-escaped-length c))
+             :while (or (nil? precision) (<= written precision))]
+        (generate-escaped c))
 
       (yield (chr "\""))))
 

@@ -60,28 +60,26 @@ expands them to [start, start + 1, start + 2, ..., end] and concatanates them."
     # no escape needed
     1))
 
-(defn generate-escaped [s]
-  "Generator that yields an escaped version of char or string `s`, replacing special characters with \\<code>"
-  (if (string? s)
-    (loop [c :in s] (generate-escaped c))
+(defn generate-escaped
+  "Generator that yields an escaped version of a character `c`, replacing special characters with \\<code>"
 
-    (do
-      (assert (ascii? s))
+  [c]
+  (assert (ascii? c))
 
-      (case s
-        (chr "\"") (yield "\\\"")
-        (chr "\n") (yield "\\n")
-        (chr "\r") (yield "\\r")
-        (chr "\0") (yield "\\0")
-        (chr "\f") (yield "\\f")
-        (chr "\v") (yield "\\v")
-        (chr "\e") (yield "\\e")
-        (chr "\\") (yield "\\\\")
-        (chr "\t") (yield "\\t")
-        (if (or (< s 32) (> s 126))
-          (do
-            (yield "\\x")
-            (yield (digit-to-char (band (brshift s 4) 0xF)))
-            (yield (digit-to-char (band s 0xF))))
+  (case c
+    (chr "\"") (yield "\\\"")
+    (chr "\n") (yield "\\n")
+    (chr "\r") (yield "\\r")
+    (chr "\0") (yield "\\0")
+    (chr "\f") (yield "\\f")
+    (chr "\v") (yield "\\v")
+    (chr "\e") (yield "\\e")
+    (chr "\\") (yield "\\\\")
+    (chr "\t") (yield "\\t")
+    (if (or (< c 32) (> c 126))
+      (do
+        (yield "\\x")
+        (yield (digit-to-char (band (brshift c 4) 0xF)))
+        (yield (digit-to-char (band c 0xF))))
 
-          (yield s))))))
+      (yield c))))

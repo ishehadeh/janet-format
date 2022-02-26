@@ -11,3 +11,7 @@
 (assert= (s-format-string "hi" {:precision 6 :alternate true}) "\"hi\"")
 (assert= (s-format-string "hello" {:precision 6 :alternate true}) "\"hell\"")
 (assert= (s-format-string "hel\x7f" {:precision 6 :alternate true}) "\"hel\"")
+(assert= (s-format-string "ab\x7f" {:precision 5 :alternate true}) "\"ab\"")
+(assert= (s-format-string "a\n" {:precision 4 :alternate true}) "\"a\"")
+(assert= (s-format-string "a\n" {:precision 0 :alternate true}) "\"\"")
+(assert= (s-format-string "a\n" {:precision 2 :alternate true}) "\"\"")
