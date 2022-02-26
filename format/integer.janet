@@ -7,7 +7,6 @@
   (default sign :negative)
   (default uppercase false)
   (default include-prefix false)
-  # TODO: handle precision
 
   (assert (int? integer))
 
