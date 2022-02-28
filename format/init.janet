@@ -25,7 +25,6 @@
 
     :spec (*
             (group (opt :align)) # alignment + fill character
-            # TODO implement space
             (/ (<- (opt (set "+- "))) ,|(case $ "+" :always "-" :negative " " :pad nil)) # "+" means always print sign, "-" is the same as default behavior, " " means pad with space
             (/ (<- (opt "#")) ,(partial = "#")) # alternate form
             (/ (<- (opt "0")) ,(partial = "0")) # numeric pad (sign aware + pad with zeroes)
