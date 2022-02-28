@@ -11,7 +11,7 @@
 (assert= (s-format-integer 15 {:pad {:width 10 :align :left :fill " "}}) "15        ")
 (assert= (s-format-integer 15 {:pad {:width 10 :align :left :fill "+"}}) "15++++++++")
 
-(assert= (s-format-integer 5 {:pad {:width 10 :align :center :fill " "}}) "     5    ")
+(assert= (s-format-integer 5 {:pad {:width 10 :align :center :fill " "}}) "    5     ")
 (assert= (s-format-integer 15 {:pad {:width 10 :align :center :fill " "}}) "    15    ")
 (assert= (s-format-integer 15 {:pad {:width 10 :align :center :fill "+"}}) "++++15++++")
 

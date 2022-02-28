@@ -1,4 +1,4 @@
-(use ./util)
+(use ./util ./padding)
 
 (setdyn :doc "Routines for formatting integers")
 
@@ -48,39 +48,11 @@
         :pad (if neg "-" " ")
         (errorf "unexpected sign spec %q, expected :negative, :always, or :pad" sign))))
 
-  # fill is the character used to pad
-  # num-pad: padding after the prefix, before the number
-  # left-pad: padding to the left of the sign
-  # right-pad: padding to the right of the number
-  (def [fill num-pad left-pad right-pad]
-    (if-let [{:width width :fill fill :numeric numeric :align align} pad
-             padding (- width (length sign) (if (nil? prefix) 0 (length prefix)) (length scratch-buffer))]
-      (if numeric
-        [(chr "0") padding 0 0]
+  (def output-length (+ (length sign) (if (nil? prefix) 0 (length prefix)) (length scratch-buffer)))
+  (pad-around output-length pad
+              (do
+                (yield sign)
+                (when prefix (yield prefix)))
 
-        (case align
-          :left [fill 0 0 padding]
-          :right [fill 0 padding 0]
-          :center
-          (let [l (math/ceil (/ padding 2))]
-            [fill 0 l (- padding l)])))
-
-      [nil 0 0 0]))
-
-  (repeat left-pad
-    (yield fill))
-
-  (unless (zero? (length sign))
-    (yield sign))
-
-  (unless (nil? prefix)
-    (yield prefix))
-
-  (repeat num-pad
-    (yield fill))
-
-  (loop [i :down-to [(dec (length scratch-buffer)) 0]]
-    (yield (scratch-buffer i)))
-
-  (repeat right-pad
-    (yield fill)))
+              (loop [i :down-to [(dec (length scratch-buffer)) 0]]
+                (yield (scratch-buffer i)))))

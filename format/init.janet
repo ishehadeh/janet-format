@@ -1,4 +1,4 @@
-(use ./float ./string ./integer ./util)
+(use ./float ./string ./integer ./util ./padding)
 
 (def- format-grammar
   ~{:symchars (+ (range "09" "AZ" "az" "\x80\xFF") (set "!$%&*+-./<?=>@^_")) # TODO this should include ":" but thats a special character in the syntax...
@@ -165,28 +165,10 @@ Example: `(indent-formatter |(compile "{:#}" [1 2 3]) "--")`
       (char-escaped-length char)
       1))
 
-  # TODO: this block was copied from `format-string` it should really be a util function
-  #    (unwrap-pad spec) or something
-  (def [pad-l pad-r pad-char]
-    (if-let [{:width width :align align :fill fill} pad
-             padding-needed (- width value-length)]
-      (do
-        (default align :right)
-        (default fill (chr " "))
-
-        (case align
-          :right [padding-needed 0 fill]
-          :left [0 padding-needed fill]
-          :center (let [h (/ padding-needed 2)] [(math/floor h) (math/ceil h) fill])))
-      [0 0 nil]))
-
-  (repeat pad-l
-    (yield pad-char))
-  (if alternate
-    (generate-escaped char)
-    (yield char))
-  (repeat pad-r
-    (yield pad-char)))
+  (pad-around value-length pad
+              (if alternate
+                (generate-escaped char)
+                (yield char))))
 
 (set format-any
      (fn [value spec]
