@@ -155,8 +155,7 @@ Example: `(indent-formatter |(compile "{:#}" [1 2 3]) "--")`
 
 
 (defn format-char [char {:alternate alternate :pad pad}]
-  # FIXME: at the moment this ignores precision, should it??
-  # TODO: expand to handle unicode characters?
+  # TODO: handle unicode characters
   (assert (ascii? char))
 
   # alternate means escape the char
