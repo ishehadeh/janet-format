@@ -17,7 +17,14 @@ static Janet cfun_to_decimal(int32_t argc, Janet* argv) {
 }
 
 static const JanetReg cfuns[] = {
-    {"to-decimal", cfun_to_decimal, "(dragonbox/to-decimal num)\n\nconverts the floating-point number into a decimal number. Returns a two-element tuple [signficand exponent]."},
+    {"to-decimal", cfun_to_decimal,
+        "(dragonbox/to-decimal num)\n\n"
+        "converts the floating-point number into a decimal number.\n"
+        "Returns a three-element tuple [sign significand exponent].\n"
+        "- `sign` (boolean): true if the number is positive, false if it is negative\n"
+        "- `significand` (int/u64): the significant digits of `num`\n"
+        "- `exponent` (number): the exponent of `num`\n"},
+
     {NULL, NULL, NULL}
 };
 
