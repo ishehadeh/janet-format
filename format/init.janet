@@ -262,7 +262,7 @@ Example: `(indent-formatter |(compile "{:#}" [1 2 3]) "--")`
            :pad pad-spec
            :alternate (and hash)
            :number {:sign (or sign :negative)
-                    :uppercase (includes? type "FGEXOB")
+                    :uppercase (includes? (get type 0) "FGEXOB")
                     :format (case type
                               "c" :char
                               "x" :hex "X" :hex

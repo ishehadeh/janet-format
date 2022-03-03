@@ -26,7 +26,7 @@
   (var remaining-digits (math/abs integer))
   (forever
     (def digit (% remaining-digits radix))
-    (buffer/push-byte scratch-buffer (digit-to-char digit))
+    (buffer/push-byte scratch-buffer (digit-to-char digit :uppercase uppercase))
     (set remaining-digits (/ (- remaining-digits digit) radix))
 
     (when (= remaining-digits 0)

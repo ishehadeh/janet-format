@@ -4,7 +4,7 @@
 (defn format-float [num spec]
   (if (nan? num)
     (pad-around 3 (spec :pad)
-                (yield (if (spec :uppercase) "NAN" "nan")))
+                (yield (if ((spec :number) :uppercase) "NAN" "nan")))
 
     (if (= (math/abs num) math/inf)
       (do
@@ -12,7 +12,7 @@
         (pad-around (+ (if sign 1 0) 3) (spec :pad)
                     (do
                       (when sign (yield sign))
-                      (yield (if (spec :uppercase) "INF" "inf")))))
+                      (yield (if ((spec :number) :uppercase) "INF" "inf")))))
 
       (let [{:number {:format f}} spec
             parts (dragonbox/to-decimal num)]
