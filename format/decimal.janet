@@ -3,19 +3,23 @@
 
 # TODO padding
 
-(def- u64-max (u64 "18446744073709551615"))
-(defmacro- gen-u64-count-digits
-  "Count the number digits in a u64, `val`, by generating a cond-table inline."
-  [val &keys {:magnitude return-magnitude}]
+(defmacro- gen-count-digits
+  "Count the number decimal digits in a number, `val`, by generating a cond-table inline."
+  [val &keys {:ten ten :max max}]
+  (default ten '10)
+  (default max 'math/int32-max)
+
+  (def ten (eval ten))
+  (def max (eval max))
 
   (def conditions @[])
-  (var magnitude (u64 10))
+  (var magnitude ten)
   (var digits 2)
-  (while (< magnitude (/ u64-max (u64 10)))
+  (while (< magnitude (/ max ten))
     # the result ("digits") is placed first and >= is used becuase `conditions` will be reversed before being emitted. 
-    (array/push conditions (if return-magnitude magnitude digits) ~(>= ,val ,magnitude))
+    (array/push conditions digits ~(>= ,val ,magnitude))
 
-    (*= magnitude (u64 10))
+    (*= magnitude ten)
     (+= digits 1))
 
   (array/push conditions digits ~(>= ,val ,magnitude))
@@ -37,7 +41,9 @@
 (defn u64-count-digits
   "returns the number of decimal digits in an int/u64"
   [x]
-  (gen-u64-count-digits x))
+  (gen-count-digits x
+                    :ten (int/u64 10)
+                    :max (int/u64 "18446744073709551615")))
 
 (defn u64-count-significant-digits
   "returns the number of significant digits (i.e. digits excluding trailing zeroes) in an int/u64"
