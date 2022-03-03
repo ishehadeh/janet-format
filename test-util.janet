@@ -33,4 +33,4 @@
   "construct a new decimal number"
   [significand exponent]
   (assert (int? exponent))
-  [(>= significand 0) (int/u64 (math/abs significand)) exponent])
+  [(neg? significand) (int/u64 (math/abs significand)) exponent])
