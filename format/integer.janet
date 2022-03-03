@@ -40,18 +40,14 @@
         10 nil
         16 (if uppercase "0X" "0x"))))
 
-  (def sign
-    (let [neg (neg? integer)]
-      (case sign
-        :negative (if neg "-" "")
-        :always (if neg "-" "+")
-        :pad (if neg "-" " ")
-        (errorf "unexpected sign spec %q, expected :negative, :always, or :pad" sign))))
-
-  (def output-length (+ (length sign) (if (nil? prefix) 0 (length prefix)) (length scratch-buffer)))
+  (def sign (sign-char (neg? integer) sign))
+  (def output-length (+
+                       (if sign 1 0)
+                       (if prefix (length prefix) 0)
+                       (length scratch-buffer)))
   (pad-around output-length pad
               (do
-                (yield sign)
+                (when sign (yield sign))
                 (when prefix (yield prefix)))
 
               (loop [i :down-to [(dec (length scratch-buffer)) 0]]

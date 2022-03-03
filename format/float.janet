@@ -1,19 +1,13 @@
 (import dragonbox)
-(use ./decimal)
+(use ./decimal ./util)
 
 (defn format-float [num spec]
   (if (nan? num)
     (yield (if (spec :uppercase) "NAN" "nan"))
 
     (do
-      (yield
-        (let [neg (neg? num)
-              sign (get (get spec :number {}) :sign :negative)]
-          (case sign
-            :negative (if neg "-" "")
-            :always (if neg "-" "+")
-            :pad (if neg "-" " ")
-            (errorf "expected sign specified %q, expected :negative, :always, or :pad" sign))))
+      (if-let [sign (sign-char (neg? num) ((spec :number) :sign))]
+        (yield sign))
 
       (if (= (math/abs num) math/inf)
         (yield (if (spec :uppercase) "INF" "inf"))

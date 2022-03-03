@@ -83,3 +83,21 @@ expands them to [start, start + 1, start + 2, ..., end] and concatanates them."
         (yield (digit-to-char (band c 0xF))))
 
       (yield c))))
+
+(defn sign-char
+  ```
+  Returns a the correct sign character for the number spec and sign combination.
+  The first paramater is true if the sign should be for a negative number (i.e. the result of `neg?`).
+  Returns nil if no sign is needed.
+  Examples:
+  - (sign-char (neg? 5) :pad) # => (chr " ")
+  - (sign-char (neg? 0) :negative) # => nil
+  ```
+  [neg sign-spec]
+  (if neg
+    (chr "-")
+    (case sign-spec
+      :negative nil
+      :always (chr "+")
+      :pad (chr " ")
+      (errorf "invalid sign spec %q, expected :negative, :always, or :pad" sign-spec))))
