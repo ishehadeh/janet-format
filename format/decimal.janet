@@ -1,7 +1,5 @@
 (import int-ext)
-(use ./util)
-
-# TODO padding
+(use ./util ./padding)
 
 (defmacro- gen-count-digits
   "Count the number decimal digits in a number, `val`, by generating a cond-table inline."
@@ -117,13 +115,18 @@
     (coro
       (format-decimal-fixed-reversed parts spec)))
 
+  (def sign (sign-char (parts 0) ((spec :number) :sign)))
   (loop [c :in reversed-generator]
     (buffer/push reversed c))
 
-  (loop [i :down-to [(dec (length reversed)) 0]]
-    (yield (reversed i))))
+  (def content-length (+ (if sign 1 0) (length reversed)))
+  (pad-around content-length (spec :pad)
+              (when sign (yield sign))
 
-(defn format-decimal-scientific [[sign significand exponent] {:alternate keep-decimal :precision precision :number num-spec}]
+              (loop [i :down-to [(dec (length reversed)) 0]]
+                (yield (reversed i)))))
+
+(defn format-decimal-scientific [[sign significand exponent] {:alternate keep-decimal :precision precision :number num-spec :pad pad-spec}]
   (assert (u64? significand))
   (assert (int? exponent))
 
@@ -136,26 +139,35 @@
   (loop [c :in (coro (format-decimal-fixed-reversed [sign significand fixed-part-exponent] {:alternate keep-decimal :precision precision}))]
     (buffer/push scratch-buffer c))
 
-  (loop [i :down-to [(dec (length scratch-buffer)) 0]]
-    (yield (scratch-buffer i)))
+  (def sign (sign-char sign (num-spec :sign)))
+  (def content-length
+    (+ (if sign 1 0)
+       (length scratch-buffer)
+       2 # exponent character and exponent sign 
+       (max 2 (gen-count-digits real-exponent))))
+  (pad-around content-length pad-spec
+              (when sign (yield sign))
+              (do
+                (loop [i :down-to [(dec (length scratch-buffer)) 0]]
+                  (yield (scratch-buffer i)))
 
-  (yield (if (and num-spec (num-spec :uppercase)) "E" "e"))
-  (yield (if (neg? real-exponent) "-" "+"))
+                (yield (if (and num-spec (num-spec :uppercase)) "E" "e"))
+                (yield (if (neg? real-exponent) "-" "+"))
 
-  (buffer/clear scratch-buffer)
-  (var remaining-exp-digits (math/abs real-exponent))
+                (buffer/clear scratch-buffer)
+                (var remaining-exp-digits (math/abs real-exponent))
 
-  (while (> remaining-exp-digits 0)
-    (def digit (% remaining-exp-digits 10))
-    (buffer/push-byte scratch-buffer (digit-to-char digit))
-    (set remaining-exp-digits (/ (- remaining-exp-digits digit) 10)))
+                (while (> remaining-exp-digits 0)
+                  (def digit (% remaining-exp-digits 10))
+                  (buffer/push-byte scratch-buffer (digit-to-char digit))
+                  (set remaining-exp-digits (/ (- remaining-exp-digits digit) 10)))
 
-  # pad the exponent to 2 characters
-  (repeat (- 2 (length scratch-buffer))
-    (yield (chr "0")))
+                # pad the exponent to 2 characters
+                (repeat (- 2 (length scratch-buffer))
+                  (yield (chr "0")))
 
-  (loop [i :down-to [(dec (length scratch-buffer)) 0]]
-    (yield (scratch-buffer i))))
+                (loop [i :down-to [(dec (length scratch-buffer)) 0]]
+                  (yield (scratch-buffer i))))))
 
 (defn format-decimal-general [[sign significand exponent] spec]
   (def rounded-significand

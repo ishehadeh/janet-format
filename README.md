@@ -8,7 +8,6 @@ This library is very much a WIP!
 
 Most of the builtin type formatters are implemented. Some are only partially complete though.\
 Specifically needed:
-- padding for floats
 - format unicode codepoints with `c`
 
 There are some tests, but they aren't very thorough, especially around the actual `format` macro.

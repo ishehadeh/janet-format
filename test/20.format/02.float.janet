@@ -6,6 +6,10 @@
 (assert= (format "{}" math/-inf) "-inf")
 (assert= (format "{}" math/nan) "nan")
 
+(assert= (format "{:10}" math/inf) "       inf")
+(assert= (format "{:10}" math/-inf) "      -inf")
+(assert= (format "{:10}" math/nan) "       nan")
+
 # Sign formatting
 (assert= (format "{:-}" math/-inf) "-inf")
 (assert= (format "{: }" math/inf) " inf")
@@ -21,6 +25,7 @@
 (assert= (format "{:.5f}" 3.1) "3.10000")
 (assert= (format "{:+f}" 2.75) "+2.75")
 (assert= (format "{: f}" 0) " 0")
+(assert= (format "{:+06f}" 2.75) "+02.75")
 
 # scientific notation number formatting
 (assert= (format "{:e}" 3001.5) "3.0015e+03")
